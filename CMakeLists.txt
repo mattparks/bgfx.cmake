@@ -69,7 +69,7 @@ if( BGFX_BUILD_TOOLS )
 	include( cmake/tools.cmake )
 endif()
 
-if( BGFX_BUILD_TOOLS OR BGFX_BUILD_EXAMPLES )
+if( BGFX_BUILD_EXAMPLES )
 	include( cmake/examples.cmake )
 endif()
 
@@ -155,22 +155,12 @@ if( BGFX_INSTALL )
 	)
 
 	# install tools
-	if( BGFX_BUILD_TOOLS )
-		install( TARGETS shaderc
-			EXPORT "${TARGETS_EXPORT_NAME}"
-			DESTINATION "${CMAKE_INSTALL_BINDIR}" )
-		install( TARGETS geometryc
-			EXPORT "${TARGETS_EXPORT_NAME}"
-			DESTINATION "${CMAKE_INSTALL_BINDIR}" )
-    	install( TARGETS geometryv
-			EXPORT "${TARGETS_EXPORT_NAME}"
-			DESTINATION "${CMAKE_INSTALL_BINDIR}" )
-		install( TARGETS texturec
-			EXPORT "${TARGETS_EXPORT_NAME}"
-			DESTINATION "${CMAKE_INSTALL_BINDIR}" )
-		install( TARGETS texturev
-			EXPORT "${TARGETS_EXPORT_NAME}"
-			DESTINATION "${CMAKE_INSTALL_BINDIR}" )
+	if( BGFX_BUILD_TOOLS AND BGFX_INSTALL_TOOLS )
+		foreach( TOOL ${BGFX_TOOLS} )
+			install( TARGETS ${TOOL}
+				EXPORT "${TARGETS_EXPORT_NAME}"
+				DESTINATION "${CMAKE_INSTALL_BINDIR}" )
+		endforeach()
 	endif()
 
 	# install examples

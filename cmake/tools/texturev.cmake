@@ -10,6 +10,8 @@
 
 include( CMakeParseArguments )
 
+include( cmake/example-common.cmake )
+
 add_executable( texturev ${BGFX_DIR}/tools/texturev/texturev.cpp )
 set_target_properties( texturev PROPERTIES FOLDER "bgfx/tools" )
 target_link_libraries( texturev example-common )
