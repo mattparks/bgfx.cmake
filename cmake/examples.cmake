@@ -71,9 +71,11 @@ set(
 )
 
 foreach( EXAMPLE ${BGFX_EXAMPLES} )
-	option( BGFX_BUILD_EXAMPLE_${EXAMPLE} "Build bgfx example ${EXAMPLE}." ON  )
+	string( REPLACE "-" "_" TYPE ${EXAMPLE} )
+	string( TOUPPER "${TYPE}" TYPE )
+	option( BGFX_BUILD_EXAMPLE_${TYPE} "Build bgfx example ${TYPE}." ON  )
 
-	if( BGFX_BUILD_TOOL_${EXAMPLE} )
+	if( BGFX_BUILD_EXAMPLE_${TYPE} )
 		add_example( ${EXAMPLE} )
 	endif()
 endforeach()

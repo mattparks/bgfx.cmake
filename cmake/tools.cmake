@@ -31,9 +31,10 @@ set(
 )
 
 foreach( TOOL ${BGFX_TOOLS} )
-	option( BGFX_BUILD_TOOL_${TOOL} "Build bgfx tool ${TOOL}." ON  )
+	string( TOUPPER "${TOOL}" TYPE )
+	option( BGFX_BUILD_TOOL_${TYPE} "Build bgfx tool ${TYPE}." ON  )
 
-	if( BGFX_BUILD_TOOL_${TOOL} )
+	if( BGFX_BUILD_TOOL_${TYPE} )
 		add_tool( ${TOOL} )
 	endif()
 endforeach()
