@@ -33,6 +33,8 @@ add_library( bx STATIC ${BX_SOURCES} )
 # Link against psapi on Windows
 if( WIN32 )
 	target_link_libraries( bx PUBLIC psapi )
+elseif( ANDROID )
+    target_link_libraries( bx PUBLIC android log )
 endif()
 
 include(GNUInstallDirs)
