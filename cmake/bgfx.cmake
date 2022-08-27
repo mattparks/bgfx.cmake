@@ -111,7 +111,10 @@ elseif( APPLE )
 	target_link_libraries( bgfx PUBLIC ${COCOA_LIBRARY} ${METAL_LIBRARY} ${QUARTZCORE_LIBRARY} ${IOKIT_LIBRARY} ${COREFOUNDATION_LIBRARY} )
 endif()
 
-if( UNIX AND NOT APPLE AND NOT EMSCRIPTEN AND NOT ANDROID )
+if ( ANDROID )
+	#The following commented libraries are linked by bx
+	target_link_libraries( bgfx PUBLIC EGL GLESv1_CM GLESv2 GLESv3 )
+elseif( UNIX AND NOT APPLE AND NOT EMSCRIPTEN )
 	find_package(X11 REQUIRED)
 	find_package(OpenGL REQUIRED)
 	#The following commented libraries are linked by bx
