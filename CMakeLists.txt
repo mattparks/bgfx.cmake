@@ -70,11 +70,15 @@ include( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/bx.cmake )
 include( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/bimg.cmake )
 include( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/bgfx.cmake )
 
+if( BGFX_BUILD_TOOLS OR BGFX_BUILD_EXAMPLES )
+	include( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/example-common.cmake )
+endif()
+
 if( BGFX_BUILD_TOOLS )
 	include( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/tools.cmake )
 endif()
 
-if( BGFX_BUILD_TOOLS OR BGFX_BUILD_EXAMPLES )
+if( BGFX_BUILD_EXAMPLES )
 	include( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/examples.cmake )
 endif()
 
@@ -162,22 +166,12 @@ if( BGFX_INSTALL )
 	# install tools
 	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/bgfxToolUtils.cmake
 		DESTINATION "${config_install_dir}")
-	if( BGFX_BUILD_TOOLS )
-		install( TARGETS shaderc
-			EXPORT "${TARGETS_EXPORT_NAME}"
-			DESTINATION "${CMAKE_INSTALL_BINDIR}" )
-		install( TARGETS geometryc
-			EXPORT "${TARGETS_EXPORT_NAME}"
-			DESTINATION "${CMAKE_INSTALL_BINDIR}" )
-    	install( TARGETS geometryv
-			EXPORT "${TARGETS_EXPORT_NAME}"
-			DESTINATION "${CMAKE_INSTALL_BINDIR}" )
-		install( TARGETS texturec
-			EXPORT "${TARGETS_EXPORT_NAME}"
-			DESTINATION "${CMAKE_INSTALL_BINDIR}" )
-		install( TARGETS texturev
-			EXPORT "${TARGETS_EXPORT_NAME}"
-			DESTINATION "${CMAKE_INSTALL_BINDIR}" )
+	if( BGFX_BUILD_TOOLS AND BGFX_INSTALL_TOOLS )
+		foreach( TOOL ${BGFX_TOOLS} )
+			install( TARGETS ${TOOL}
+				EXPORT "${TARGETS_EXPORT_NAME}"
+				DESTINATION "${CMAKE_INSTALL_BINDIR}" )
+		endforeach()
 	endif()
 
 	# install examples
