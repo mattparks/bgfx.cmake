@@ -13,8 +13,28 @@ if( BGFX_CUSTOM_TARGETS )
 	set_target_properties( tools PROPERTIES FOLDER "bgfx/tools" )
 endif()
 
-include( ${CMAKE_CURRENT_LIST_DIR}/tools/geometryc.cmake )
-include( ${CMAKE_CURRENT_LIST_DIR}/tools/geometryv.cmake )
-include( ${CMAKE_CURRENT_LIST_DIR}/tools/shaderc.cmake )
-include( ${CMAKE_CURRENT_LIST_DIR}/tools/texturec.cmake )
-include( ${CMAKE_CURRENT_LIST_DIR}/tools/texturev.cmake )
+function( add_tool ARG_NAME )
+	# Parse arguments
+	cmake_parse_arguments( ARG "COMMON" "" "DIRECTORIES;SOURCES" ${ARGN} )
+
+	include( ${CMAKE_CURRENT_LIST_DIR}/tools/${ARG_NAME}.cmake )
+endfunction()
+
+# Add tools
+set(
+	BGFX_TOOLS
+	geometryc
+	geometryv
+	shaderc
+	texturec
+	texturev
+)
+
+foreach( TOOL ${BGFX_TOOLS} )
+	string( TOUPPER "${TOOL}" TYPE )
+	option( BGFX_BUILD_TOOL_${TYPE} "Build bgfx tool ${TYPE}." ON  )
+
+	if( BGFX_BUILD_TOOL_${TYPE} )
+		add_tool( ${TOOL} )
+	endif()
+endforeach() 
