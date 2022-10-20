@@ -25,15 +25,25 @@ if (MSVC AND (MSVC_VERSION GREATER_EQUAL 1914))
     add_compile_options("/Zc:__cplusplus")
 endif()
 
-option( BGFX_BUILD_TOOLS                "Build bgfx tools."                             ON  )
-option( BGFX_BUILD_EXAMPLES             "Build bgfx examples."                          ON  )
+include( CMakeDependentOption )
+
+option( BX_BUILD                            "Build bx."                                 ON  )
+cmake_dependent_option( BIMG_BUILD          "Build bimg."                               ON
+                        "BX_BUILD"                                                      OFF )
+cmake_dependent_option( BGFX_BUILD          "Build bgfx."                               ON
+                        "BX_BUILD;BIMG_BUILD"                                           OFF )
+cmake_dependent_option( BGFX_BUILD_TOOLS    "Build bgfx tools."                         ON
+                        "BGFX_BUILD"                                                    OFF )
+cmake_dependent_option( BGFX_BUILD_EXAMPLES "Build bgfx examples."                      ON 
+                        "BGFX_BUILD"                                                    OFF )
 option( BGFX_INSTALL                    "Create installation target."                   ON  )
 option( BGFX_INSTALL_EXAMPLES           "Install examples and their runtimes."          OFF )
 option( BGFX_CUSTOM_TARGETS             "Include convenience custom targets."           ON  )
 option( BGFX_AMALGAMATED                "Amalgamated bgfx build for faster compilation" OFF )
 option( BX_AMALGAMATED                  "Amalgamated bx build for faster compilation"   OFF )
 option( BGFX_CONFIG_MULTITHREADED       "Build bgfx with multithreaded configuration"   ON )
-option( BGFX_CONFIG_RENDERER_WEBGPU     "Enables the webgpu renderer"                   OFF )
+cmake_dependent_option( BGFX_CONFIG_RENDERER_WEBGPU "Enables the webgpu renderer"       OFF
+                        "BGFX_BUILD"                                                    OFF )
 option( BX_CONFIG_DEBUG                 "Log debug messages (default: on in debug)"     OFF )
 
 set( BGFX_OPENGL_VERSION   ""       CACHE STRING "Specify minimum opengl version" )
@@ -65,16 +75,24 @@ endif()
 # sets project version from api ver / git rev
 include( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.cmake )
 
-include( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/shared.cmake )
-include( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/bx.cmake )
-include( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/bimg.cmake )
-include( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/bgfx.cmake )
+if( BX_BUILD )
+	include( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/bx.cmake )
+endif()
+
+if( BIMG_BUILD )
+	include( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/bimg.cmake )
+endif()
+
+if( BGFX_BUILD )
+	include( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/bgfx.cmake )
+endif()
 
 if( BGFX_BUILD_TOOLS OR BGFX_BUILD_EXAMPLES )
 	include( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/example-common.cmake )
 endif()
 
 if( BGFX_BUILD_TOOLS )
+	include( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/shared.cmake )
 	include( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/tools.cmake )
 endif()
 
@@ -127,20 +145,31 @@ if( BGFX_INSTALL )
 
 	install(FILES ${BGFX_DIR}/LICENSE DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/licences/${PROJECT_NAME})
 
-	install( TARGETS bgfx
-			 EXPORT "${TARGETS_EXPORT_NAME}"
-			 LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-			 ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-			 RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
-			 INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
-	)
-	if( NOT BGFX_LIBRARY_TYPE MATCHES "SHARED" )
-		install( TARGETS bimg bx astc-codec astc edtaa3 etc1 etc2 iqa squish nvtt pvrtc tinyexr
-				 EXPORT "${TARGETS_EXPORT_NAME}"
-				 LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-				 ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-				 RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
-				 INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+	if( BX_BUILD AND NOT BGFX_LIBRARY_TYPE MATCHES "SHARED" )
+		install( TARGETS bx
+				EXPORT "${TARGETS_EXPORT_NAME}"
+				LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+				ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+				RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+				INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+		)
+	endif()
+	if( BIMG_BUILD AND NOT BGFX_LIBRARY_TYPE MATCHES "SHARED" )
+		install( TARGETS bimg astc-codec astc edtaa3 etc1 etc2 iqa squish nvtt pvrtc tinyexr
+				EXPORT "${TARGETS_EXPORT_NAME}"
+				LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+				ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+				RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+				INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+		)
+	endif()
+	if( BGFX_BUILD )
+		install( TARGETS bgfx
+				EXPORT "${TARGETS_EXPORT_NAME}"
+				LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+				ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+				RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+				INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
 		)
 	endif()
     if (BGFX_CONFIG_RENDERER_WEBGPU)
